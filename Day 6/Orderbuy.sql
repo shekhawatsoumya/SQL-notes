@@ -22,6 +22,7 @@ order by creditlimit desc;
 select contactlastname,contactfirstname from customers
 order by contactlastname desc,contactFirstName asc;
 
+
 #wasql that fetch ordernumber and their ordervalue from orderdetails table sort the data by ordervalue in desc order?
 select ordernumber,(quantityordered*priceeach) as ordervalue from orderdetails
 order by ordervalue desc;
@@ -40,5 +41,4 @@ select * from employees order by reportsto asc;
 #wasq to fetch ordernumber,orderdate and status and sort the data by orderdate from most recent to outdated?
 select ordernumber,orderdate,status from orders 
 order by orderdate desc;
-
 
