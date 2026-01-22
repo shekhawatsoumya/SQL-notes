@@ -42,3 +42,6 @@ select * from employees order by reportsto asc;
 select ordernumber,orderdate,status from orders 
 order by orderdate desc;
 
+#wasql that fetch ordernumber and their ordervalue from orderdetails table sort the data by ordervalue in desc order?
+select ordernumber,(quantityordered*priceeach) as ordervalue from orderdetails
+order by ordervalue desc;
