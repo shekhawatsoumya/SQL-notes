@@ -75,5 +75,106 @@ union all
 select * from table1 t1 
 right join table2 t2 on t1.id=t2.id;
 
+use dummy;
+
+#cross join
+select * from customers cross join orders;
+
+#inner join
+#inner behaves as cross join if on condition is not used.
+#wasq to fecth customer details who have placed any order?
+select * from customers c inner join orders o
+on c.customernumber=o.customernumber;
+
+select count(*) from customers c inner join orders o
+on c.customernumber=o.customernumber;
+
+
+#left join
+select * from customers c left join orders o
+on c.customernumber=o.customernumber;
+
+select count(*) from customers c left join orders o
+on c.customernumber=o.customernumber;
+
+#right join
+select * from customers c right join orders o
+on c.customernumber=o.customernumber;
+
+select count(*) from customers c right join orders o
+on c.customernumber=o.customernumber;
+
+#left exclusive
+#was to fetch customer details who have not placed any order?
+select * from customers c left join orders o
+on c.customernumber=o.customernumber
+where o.customernumber is null;
+
+select count(*) from customers c left join orders o
+on c.customernumber=o.customernumber
+where o.customernumber is null;
+
+#right exclusive
+select * from customers c right join orders o
+on c.customernumber=o.customernumber
+where c.customernumber is null;
+
+select count(*) from customers c right join orders o
+on c.customernumber=o.customernumber
+where c.customernumber is null;
+
+#natural join
+select * from customers natural join orders;
+select count(*) from customers natural join orders;
+
+#full join
+#left exclusive + right join
+select * from customers c left join orders o
+on c.customernumber=o.customernumber
+where o.customernumber is null
+union all
+select * from customers c right join orders o
+on c.customernumber=o.customernumber;
+
+select count(*) from customers c left join orders o
+on c.customernumber=o.customernumber
+where o.customernumber is null
+union all
+select count(*) from customers c right join orders o
+on c.customernumber=o.customernumber;
+
+#full join
+#left join + right exclusive
+select * from customers c left join orders o
+on c.customernumber=o.customernumber
+union all
+select * from customers c right join orders o
+on c.customernumber=o.customernumber
+where c.customernumber is null;
+
+select count(*) from customers c left join orders o
+on c.customernumber=o.customernumber
+union all
+select count(*) from customers c right join orders o
+on c.customernumber=o.customernumber
+where c.customernumber is null;
+
+#Questions-
+#wasq to fetch customername and their ordervalue?
+select customername,(priceeach*quantityordered) as ordervalue from customers c join orders o on c.customernumber=o.customernumber 
+join orderdetails od on o.ordernumber=od.ordernumber;
+
+#wasq to fetch productname and their ordervalue?
+select productname,(priceeach*quantityordered) as ordervalue from products p join 
+orderdetails od on p.productcode=od.productcode;
+
+#wasq to fetch customername and their respective sales representative name?
+select customername,concat(firstname,' ' ,lastname) as salesrepname from customers c join 
+employees e on c.salesrepemployeenumber=e.employeenumber;
+
+#wasq to fetch employeename who does not represent any customer?
+select concat(firstname," ",lastname) as employeename from employees e left join customers c on e.employeenumber=c.salesRepEmployeeNumber
+where c.salesRepEmployeeNumber is null;
+
 
 
