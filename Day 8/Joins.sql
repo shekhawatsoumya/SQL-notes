@@ -247,3 +247,36 @@ on c.salesrepemployeenumber=e.employeenumber
 join offices o on e.officecode=o.officecode
 where c.city=o.city;
 
+use dummy;
+#wasq to fetch customername who have placed order but didnot made any payment yet?
+select customername,paymentdate from customers c join orders o on c.customernumber=p.customernumber left join payments p on o.customer
+where p.paymentdate is null;
+
+#wasq to fetch employeenumber,employeefullname and customername from customers and employees 
+#(only fetch the records who belongs to usa and orderplaced between 2003-2004) and sort the data by orderdate most recent to least one?
+select employeenumber,concat(firstname," ",lastname) as employeefullname,customername from employees e join 
+customers c on e.employeenumber=c.salesrepemployeenumber
+join orders o using (customernumber) where country = "usa" and (year(orderdate) in (2003,2004))
+order by orderdate desc;
+
+select * from employees;
+#wasq to fetch manager name along with their reportee employee name?
+select m.employeenumber,concat(m.firstname," ",m.lastname) as manager,concat(e.firstname," ",e.lastname) as "directreportee",e.employeenumber 
+from employees m join employees e on m.employeenumber=e.reportsto;
+
+#wasq to find employees along with their jobtitle whos customer have ordered a product that starts with S18?
+select distinct concat(firstname," ",lastname),jobtitle from employees e join customers c on e.employeenumber=c.salesrepemployeenumber join 
+orders o on c.customernumber=o.customernumber join orderdetails od on o.ordernumber=od.ordernumber join 
+products p on od.productcode=p.productcode where p.productcode like "s18%";
+
+#display employees who work in the same country as any of their customer?
+select concat(firstname," ",lastname) as employee from employees e join customers c on e.employeenumber=c.salesrepemployeenumber
+where e.country=c.country;
+
+use dummy;
+#wasq to find customer who ordered same product as another customer but belongs to a different country? result-68420
+select c1.customername from customers c1 join orders o1 on c1.customernumber=o1.ordernumber join 
+orderdetails od1 on o1.ordernumber=od1.ordernumber join products p on od1.productcode=p.productcode join orderdetails od2 on p.productcode=od2.productcode 
+join orders o2 on od2.ordernumber=o2.ordernumber join customers c2 on o2.customernumber=c2.customernumber
+where c1.country != c2.country;
+
