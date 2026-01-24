@@ -221,5 +221,29 @@ and ordernumber is null;
 select productname from products p left join orderdetails od on p.productcode=od.productcode
 where od.productcode is null;
 
+use dummy;
+#wasql to fetch total number of records if we perform full join between 2 table first one is products and order details?
+select count(*) from products p left join orderdetails od
+on p.productcode=od.productcode
+where od.productcode is null
+union 
+select count(*) from products p right join orderdetails od
+on p.productcode=od.productcode;
 
+#wasql to fetch empfullname customername and the productname from different tables?
+select concat(firstname," ",lastname) as empfullname,customername,productname from employees e join customers c
+on e.employeenumber=c.salesrepemployeenumber join orders o on c.customernumber=o.customernumber 
+join orderdetails od on o.ordernumber=od.ordernumber join products p on od.productcode=p.productcode;
+
+
+#wasql to retrieve the name of customer and employees who belongs to same city?
+select customername,concat(firstname," ",lastname) as empname,c.city from customers c join employees e 
+on c.salesrepemployeenumber=e.employeenumber 
+join offices o on e.officecode=o.officecode
+where c.city=o.city;
+
+select customername,concat(firstname," ",lastname) as empname,c.city as sharedcity from customers c join employees e 
+on c.salesrepemployeenumber=e.employeenumber 
+join offices o on e.officecode=o.officecode
+where c.city=o.city;
 
