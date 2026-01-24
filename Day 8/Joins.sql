@@ -176,5 +176,50 @@ employees e on c.salesrepemployeenumber=e.employeenumber;
 select concat(firstname," ",lastname) as employeename from employees e left join customers c on e.employeenumber=c.salesRepEmployeeNumber
 where c.salesRepEmployeeNumber is null;
 
+#Questions
+
+#wasq to fetch customername along with their ordernumber and status(only fetch the data who have placed any order)?
+select customername,ordernumber,status from customers c join orders o on c.customernumber=o.customernumber;
+
+#wasq to fetch customer details who have not placed any order?
+select * from customers c left join orders o on c.customernumber=o.customernumber where o.customernumber is null;
+
+#wasq to fetch customername,paymentdate and amount from customers and payments table?
+select customername,paymentdate,amount from customers c join payments p 
+on c.customernumber=p.customernumber;
+
+select customernumber,customername,paymentdate,amount from customers c join payments p
+on c.customernumber=p.customernumber;
+
+select c.customernumber,customername,paymentdate,amount from customers c join payments p
+on c.customernumber=p.customernumber;
+
+#using
+select customernumber,customername,paymentdate,amount from customers join payments
+using (customernumber);
+
+#wasq to fetch orderdate and ordervalue?
+select orderdate,(quantityordered*priceeach) as ordervalue from orders o join orderdetails od 
+on o.ordernumber=od.ordernumber;
+
+#wasq to fetch empfullname,customername,orderdate,productname from multiple tables?
+select concat(firstname," ",lastname) as empfullname,customername,orderdate,productname from employees e 
+join customers c on e.employeenumber=c.salesrepemployeenumber join orders o 
+on c.customernumber=o.customernumber join orderdetails od on o.ordernumber=od.ordernumber join products p 
+on od.productcode=p.productcode;
+
+#wasq to fetch customername who have salesrepresentative but have not placed any order?
+select customername,employeenumber,firstname,lastname from customers c join employees e on c.salesrepemployeenumber=e.employeenumber
+left join orders o on c.customernumber=o.customernumber 
+where o.customernumber is null;
+
+select customername from customers left join orders using(customernumber)
+where salesrepemployeenumber is not null
+and ordernumber is null;
+
+#wasq to fetch productsname that have not been sold?
+select productname from products p left join orderdetails od on p.productcode=od.productcode
+where od.productcode is null;
+
 
 
