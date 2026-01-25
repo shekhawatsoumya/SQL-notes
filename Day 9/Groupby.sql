@@ -177,6 +177,83 @@ group by productline;
 select orderyear,sum(totalordervalue) as gtov from sales
 group by orderyear;
 
+#Rollup
+select productline,sum(totalordervalue) as gtov from sales
+group by productline
+union 
+select null,sum(totalordervalue) as gtov from sales;
+
+select productline,sum(totalordervalue) as gtov from sales
+group by productline with rollup;
+
+#wasq to fetch grandtotalvalue by productline of each year?
+select productline,orderyear,sum(totalordervalue) as gtov from sales
+group by productline,orderyear with rollup;
+select productline,orderyear,sum(totalordervalue) as gtov from sales
+group by orderyear,productline with rollup;
+
+
+#wasq to fetch productline,productname,totalbuyprice(also return the grand total)?
+select productline,productname,sum(buyprice) as totalbuyprice from products
+group by productline,productname with rollup;
+
+#wasq to fetch numberofcustomers of each country?
+select country,count(customernumber) from customers
+group by country with rollup;
+
+#was to fetch totalordervalue of eachordernumber of eachyear(also return the grandtotal)?
+select year(orderdate),ordernumber,sum(quantityordered*priceeach) as totalordervalue from orders join orderdetails using(ordernumber)
+group by 1,2 with rollup;
+
+use dummy;
+#wasq to fetch totalnumber of customer by each country 
+#and filter only those country who have more than 5 customers?
+select count(customernumber) as totalnumberofcustomer,country from customers 
+group by country
+having totalnumberofcustomer>5;
+
+#display total sales from each employee include the grand total at the end?
+select concat(firstname," ",lastname) as employee,sum(quantityordered*priceeach) as tse from employees e join
+customers c on e.employeenumber=c.salesrepemployeenumber join orders using(customernumber) 
+join orderdetails using(ordernumber)
+group by employee with rollup;
+ 
+#show the total no.of orders placed per country and include rollup total?
+select sum(ordernumber) as tnoorders,country from orders join customers using(customernumber)
+group by country with rollup;
+
+#display the averageordervalue per employee based on their customers order 
+#and list only those with the average above 2500?
+select concat(firstname," ",lastname) as employee,avg(quantityordered*priceeach) as avgordervalue,ordernumber from employees e
+join customers c on e.employeenumber=salesrepemployeenumber join orders using (customernumber) 
+join orderdetails using(ordernumber)
+group by employee,ordernumber 
+having avgordervalue>2500;
+
+use dummy;
+#wasq to fetch avgbuyprice of each productline?
+select productline,avg(buyprice) from products group by productline;
+
+#wasq to fetch total buyprice of each productline?
+select productline,sum(buyprice) from products group by productline;
+
+#wasq to fetch max,min and total order value of each productline?
+select sum(quantityordered*priceeach) as tov,max(quantityordered*priceeach),min(quantityordered*priceeach),productline
+from orderdetails join products using(productcode) group by productline;
+ 
+#wasq to fetch employeefullname and their respective customername(fetch customername in a single row with comma seperated values)?
+select concat(firstname," ",lastname) as employeefullname,customername from employees e join customers c
+on e.employeenumber=c.salesrepemployeenumber;
+select concat(firstname," ",lastname) as employeefullname,group_concat(customername) as customername from employees e join customers c
+on e.employeenumber=c.salesrepemployeenumber
+group by employeefullname;
+
+select concat(firstname," ",lastname) as employeefullname,group_concat(distinct customername 
+order by customername desc separator "/") as customername 
+from employees e join customers c
+on e.employeenumber=c.salesrepemployeenumber
+group by employeefullname;
+
 
 
 
