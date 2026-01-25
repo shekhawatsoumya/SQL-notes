@@ -56,7 +56,71 @@ select concat(firstname," ",lastname) as employeefullname,sum(quantityordered*pr
 from employees e join customers c on e.employeenumber=c.salesrepemployeenumber 
 join orders o on c.customernumber=o.customernumber
 join orderdetails od on o.ordernumber=od.ordernumber 
-group by employeefullname;
+
+ #Basic group by clause
+#wasq to fetch status from orders table?
+select status from orders;
+#wasq to fetch distinct status from orders table?
+select distinct status from orders;
+
+#Group by with aggregate function
+#single column group by
+#wasq to fetch no of orders per orderstatus?
+select status,count(*) as ordercount from orders 
+group by status;
+select status,count(*) as ordercount from orders 
+group by status
+order by status asc;
+
+#wasq to fetch totalordervalue by status?
+select status,sum(quantityordered*priceeach) as totalordervalue
+from orders o join orderdetails od using(ordernumber)
+group by status;
+
+#wasq to fetch totalordervalue by ordernumber?
+select ordernumber,sum(quantityordered*priceeach) as totalordervalue from orderdetails
+group by ordernumber;
+select ordernumber,sum(quantityordered*priceeach) as totalordervalue from orderdetails
+group by 1;
+
+#wasq to fetch totalsales by each orderyear?
+select year(orderdate) as orderyear,sum(quantityordered*priceeach) as totalsales from orders
+join orderdetails using (ordernumber)
+group by orderyear;
+
+use dummy;
+#wasq to fetch customername and totalamountpaid(of each year)?
+select customername,sum(quantityordered*priceeach) as totalamountpaid, year(orderdate) as eachyear from customers 
+join orders using(customernumber) join orderdetails using(ordernumber)
+group by customername,eachyear;
+
+select customername,sum(amount) as totalamountpaid, year(paymentdate) as eachyear from payments p join customers c
+using (customernumber)
+group by customername,year(paymentdate);
+
+#wasq to fetch productname and their totalquantityordered?
+select productname,sum(quantityordered) as totalquantityordered from orderdetails od join products p using (productcode)
+group by productname;
+
+#wasq to fetch productname and their count?
+select productname,count(productcode) as productcount from products
+group by productname;
+
+#wasq to fetch totalsales of each employee in the year 2004?
+select concat(firstname," ",lastname) as employeename,sum(quantityordered*priceeach) as totalsales,year(orderdate) odyear from employees e 
+join customers c on e.employeenumber=c.salesrepemployeenumber
+join orders using(customernumber) join orderdetails using(ordernumber) where year(orderdate)=2004
+group by employeename,odyear;
+
+select concat(firstname," ",lastname) as employeename,sum(amount) as totalsales,year(paymentdate) from employees e join customers c 
+on e.employeenumber=c.salesrepemployeenumber join payments p using(customernumber) where year(paymentdate) = "2004"
+group by 1,3;
+
+
+#wasq to get ordernumber,the number of item sold per order and total sales?
+select ordernumber,sum(quantityordered*priceeach) as totalsales,sum(quantityordered) as itemsold from orderdetails
+group by ordernumber;
+
 
 
 
