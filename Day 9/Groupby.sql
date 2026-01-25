@@ -121,6 +121,64 @@ group by 1,3;
 select ordernumber,sum(quantityordered*priceeach) as totalsales,sum(quantityordered) as itemsold from orderdetails
 group by ordernumber;
 
+#Having
+#syntax
+#select columnlist from tablename
+#where search condition
+#group by columnname
+#having grouping condition
+#order by columnname [asc/desc];
+
+#order of execution
+#from--->where--->groupby--->having--->select--->distinct--->orderby--->limit
+
+#wasq to fetch ordernumber,status and totalsales(only fetch the order whose status are shipped and 
+#total sales is greater than 10000?
+select ordernumber,status,sum(quantityordered*priceeach) as totalsales from orders join orderdetails using (ordernumber)
+group by ordernumber,status
+having status = "shipped" and totalsales>10000;
+
+#retrieve all the employees and the customers they manage but also include who manage 
+#no customers additionally show the number of orders placed by each managed customer?
+select  concat(firstname," ",lastname) as employees,customername,count(ordernumber) from employees e
+left join customers c on e.employeenumber=c.salesrepemployeenumber left join orders o using(customernumber)
+group by 1,2;
+
+
+#find all the productslines where the total revenue exceed one lakh and alteast 10 different products are sold?
+select productline,sum(quantityordered*priceeach) as totalrevenue,count(distinct productcode) as dps from products join orderdetails using(productcode)
+group by productline
+having totalrevenue>100000 and dps>=10;
+
+#wasq to fetch customers who placed more than 4 order?
+select customername,count(ordernumber) from customers join orders using(customernumber)
+group by 1
+having count(ordernumber)>4;
+
+use dummy;
+#wasq to fetch totalordervalue of each productline of each year?
+create table sales
+select year(orderdate) as orderyear,sum(quantityordered*priceeach) as totalordervalue,productline from orders 
+join orderdetails using (ordernumber)
+join products using (productcode)
+group by orderyear,productline;
+
+select * from sales;
+
+#wasq to fetch grandtotalordervalue from salestable?
+select sum(totalordervalue) as gtov from sales;
+
+#wasq to fetch grandtotalordervalue of each productline?
+select productline,sum(totalordervalue) as gtov from sales
+group by productline;
+
+
+#wasq to fetch grandtotalordervalue of each year?
+select orderyear,sum(totalordervalue) as gtov from sales
+group by orderyear;
+
+
+
 
 
 
