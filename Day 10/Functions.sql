@@ -76,6 +76,81 @@ end as customer_type from cte)
 select customer_type,count(*) as cust_count from cte1
 group by customer_type;
 
+use dummy;
+#wasq to fetch totalsales of each employee on the basis of totalsales create one customer column
+#employee_type,top,average,lowest andcount employee_type?
+
+with cte as
+(select concat(firstname," ",lastname) as emplfullname,sum(quantityordered*priceeach) as totalsales
+from employees e join customers c on e.employeenumber=c.salesrepemployeenumber
+join orders o using(customernumber) join orderdetails using(ordernumber)
+group by emplfullname),
+cte1 as
+(select*,
+case 
+when totalsales<500000 then "worst performer"
+when totalsales between 500000 and 1000000 then "average performer"
+else "topemployee"
+end as employee_type from cte)
+select employee_type,count(*) as emp_count from cte1
+group by employee_type;
+
+#wasq to fetch totalordervalue of each productline on the basis of tov create one customer column
+#productline_type
+#highest selling productline
+#average selling productline
+#lowest selling productline
+
+with cte as
+(select productline,sum(quantityordered*priceeach) as tov from products join orderdetails 
+using (productcode)
+group by productline)
+select *,
+case 
+when tov<600000 then "lowest selling productline"
+when tov between 600000 and 1000000 then "average selling productline"
+else "highest selling productline"
+end as product_type from cte;
+
+with cte as
+(select productline,sum(quantityordered*priceeach) as tov from products join orderdetails 
+using (productcode)
+group by productline),
+cte1 as
+(select *,
+case 
+when tov<600000 then "lowest selling productline"
+when tov between 600000 and 1000000 then "average selling productline"
+else "highest selling productline"
+end as product_type from cte)
+select product_type,count(*) from cte1
+group by product_type;
+
+use dummy;
+#wasq to fetch ordercount of each status in a single row
+select
+sum(case when status="shipped" then 1 else 0 end) as "shipped",
+sum(case when status="cancelled" then 1 else 0 end) as "cancelled",
+sum(case when status="resolved" then 1 else 0 end) as "resolved",
+sum(case when status="on hold" then 1 else 0 end) as "on hold",
+sum(case when status="disputed" then 1 else 0 end) as "disputed",
+sum(case when status="in process" then 1 else 0 end) as "in process",
+count(*) as ordercount from orders;
+
+#wasq to fetch no.ofproductcount of each productline in a single row?
+select count(productcode),productline from products
+group by productline;
+
+select
+sum(case when productline="classic cars" then 1 else 0 end) as "classic cars",
+sum(case when productline="motorcycles" then 1 else 0 end) as "motorcycles",
+sum(case when productline="palnes" then 1 else 0 end) as "planes",
+sum(case when productline="ships" then 1 else 0 end) as "ships",
+sum(case when productline="trains" then 1 else 0 end) as "trains",
+sum(case when productline="trucks and buses" then 1 else 0 end) as "trucks and buses",
+sum(case when productline="vintage cars" then 1 else 0 end) as "vintage cars",
+count(*) as no_ofproductcount
+from products;
 
 
 
