@@ -152,6 +152,66 @@ sum(case when productline="vintage cars" then 1 else 0 end) as "vintage cars",
 count(*) as no_ofproductcount
 from products;
 
+use dummy;
+#wasq to fetch customernumber,customername,city,state,country from customers table 
+#sort the customers by state if state is not null or sort the country in case state is null?    
+select customernumber,customername,city,state,country from customers order by
+if(state is null,state,country) asc;
+
+#wasq to fetch customername and their ordercount on the basis of ordercount 
+#create one custom column name customer_type
+#conditions are 
+#if order count is 1 then 1 time customer
+#if order count is 2 then repeated customer
+#if/when order count is 3 then frequent customer
+#if ordercount>=4 then loyal customer
+with cte as
+(select customername,count(ordernumber) as ordercount from customers join orders using(customernumber)
+group by customername),
+cte1 as
+(select *,
+if (ordercount = 1,"onetimecustomer",
+   if (ordercount =2,"repeatedcustomer",
+      if (ordercount=3,"frequentcustomer","loyalcustomer")))
+as customer_type from cte)
+select customer_type,count(*) as cust_count from cte1
+group by 1;
+
+#was to fetch customername and their tov on the basis of tov 
+#create one custom column name customer_type 
+#now conditions are
+#if tov is<10k then silver customer
+#if tov between 10k and 100k then gold customer
+#if tov is>100k then platinum customer?
+with cte as
+(select customername,sum(quantityordered*priceeach) as tov from customers join orders using(customernumber)
+join orderdetails using(ordernumber)
+group by 1),
+cte1 as
+(select*,
+if (tov<10000, "silvercustomer",
+  if (tov between 10000 and 100000, "goldcustomer","platinumcustomer")) as customer_type
+from cte)
+select customer_type,count(*) as cust_count from cte1
+group by 1;
+
+#wasq to fetch totalsales of each employee on the basis of totalsales create one customer column
+#employee_type,top,average,lowest andcount employee_type?
+#when totalsales<500000 then "worst performer"
+#when totalsales between 500000 and 1000000 then "average performer"
+#else "topemployee"
+with cte as
+(select concat(firstname," ",lastname) as emplfullname,sum(quantityordered*priceeach) as totalsales from employees e 
+join customers c on e.employeenumber=c.salesrepemployeenumber join orders using(customernumber) join orderdetails using(ordernumber)
+group by 1),
+cte1 as
+(select*,
+if (totalsales<500000,"worstperformer",
+  if (totalsales between 500000 and 1000000,"averageperformer","topemployee")) as employee_type
+from cte)
+select employee_type,count(*) from cte1
+group by 1;
+
 
 
 
