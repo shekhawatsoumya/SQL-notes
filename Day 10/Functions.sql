@@ -212,6 +212,43 @@ from cte)
 select employee_type,count(*) from cte1
 group by 1;
 
+#wasq to fetch totalordervalue of each productline on the basis of tov create one customer column
+#productline_type
+#highest selling productline
+#average selling productline
+#lowest selling productline
+#when tov<600000 then "lowest selling productline"
+#when tov between 600000 and 1000000 then "average selling productline"
+#else "highest selling productline"
+with cte as
+(select productline,sum(quantityordered*priceeach) as tov from products join orderdetails using(productcode)
+group by 1),
+cte1 as
+(select*,
+if (tov<600000,"lowestsellingproductline",
+  if (tov between 600000 and 1000000,"averagesellingproductline","highestsellingproductline")) as productline_type
+  from cte)
+  select productline_type,count(*) from cte1
+  group by 1;
+
+#wasq to fetch ordercount of each status in a single row?
+select
+sum(if(status="shipped",1,0)) as "shipped",
+sum(if(status="cancelled",1,0)) as "cancelled",
+sum(if(status="resolved",1,0)) as "resolved",
+sum(if(status="on hold",1,0)) as "on hold",
+sum(if(status="in process",1,0)) as "in process",
+count(*) as ordercount from orders;
+
+#wasq to fetch no.ofproductcount of each productline in a single row?
+select
+sum(if(status="shipped",1,0)) as "shipped",
+sum(if(status="cancelled",1,0)) as "cancelled",
+sum(if(status="resolved",1,0)) as "resolved",
+count(*) as ordercount from orders;
+
+select * from customers;
+
 
 
 
