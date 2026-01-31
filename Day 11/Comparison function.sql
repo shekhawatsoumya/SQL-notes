@@ -18,6 +18,15 @@ select customername,city,ifnull(state,country) as state,country from customers;
 select customername,city,coalesce(state,"N/A") as state,country from customers;
 select customername,city,coalesce(state,country) as state,country from customers;
 
+select customername,city,state,country from customers
+order by ifnull(state,country) asc;
+
+use dummy;
+#wasq to fetch productname,totalno.ofitemsoldperorder and tov of each productline of year 2004; 
+select productline,productname,sum(quantityordered) as totalnoofitemsoldpo,sum(quantityordered*priceeach) as tov from products 
+join orderdetails using(productcode) join orders using(ordernumber)
+where year(orderdate)=2004
+group by 1,2;
 
 
 
