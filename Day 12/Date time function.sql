@@ -68,3 +68,27 @@ group by 2,3;
 select count(ordernumber),quarter(orderdate) from orders
 group by 2;
 
+#wasq to fetch tov by month name of each year?
+select sum(quantityordered*priceeach) as tov,monthname(orderdate),year(orderdate) from orders join orderdetails using(ordernumber)
+group by 2,3;
+
+#wasq to fetch no of orders per week in the year 2003 and 2004?
+select year(orderdate) as orderyear,count(ordernumber),week(orderdate) from orders
+group by 1,3
+having orderyear in (2003,2004);
+
+use dummy;
+#String to date
+select str_to_date("12112000","%d%m%Y");
+select str_to_date("12/11/2000","%d/%m/%Y");
+select str_to_date("201234","%H%i%s");
+select str_to_date("14","%H");
+
+#Date format
+select ordernumber,
+date_format(orderdate,"%Y-%m-%d"),
+date_format(requireddate,"%a %d %b %Y"),
+date_format(shippeddate,"%W %d %M %Y")
+from orders;
+
+
