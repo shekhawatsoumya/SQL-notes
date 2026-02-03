@@ -78,3 +78,24 @@ select customername from customers
 where substring(customername,1,1) in ("a","e","i","o","u") 
 and substring(customername,-1,1) in ("a","e","i","o","u");
 
+use dummy;
+#wasql to fetch employees fullname whose first name starts with vowel and 
+#lastname ends with consonant with help of substring function?
+select concat_ws(" ",firstname,lastname) as empfullname from employees
+where substring(firstname,1,1) in ("a","e","i","o","u") and
+substring(lastname,-1,1) not in ("a","e","i","o","u");
+
+
+# instr(string,substring)
+
+select instr("welcome to bhopal","w");
+select instr("welcome to bhopal","o");
+select instr("welcome to bhopal","bhopal");
+select instr("welcome to bhopal","bho");
+select instr("decode","z");
+
+#wasq to fetch productname that contain car key word in it(with the help of instr function)?
+select productname from products
+where instr(productname,"car");
+
+select instr(productname,"car") from products;
