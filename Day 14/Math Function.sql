@@ -51,7 +51,24 @@ where quarter(orderdate) in (2,3)
 group by 1,3,4
 order by productline;
 
+use dummy;
 
+#truncate(x,d)
+# here x is value, d is upto decimals.
+
+select truncate(199.99,1); #199.9
+select truncate(199.99,0); #199
+select truncate(199.99,2); #199.99
+
+#Round(x,[d])
+# x is value/number, d is upto decimal
+# d is by default 0.
+
+select round(199.99,1); #200.0
+select round(199.99); #200
+select round(199.999,2); #200.00
+select round(199.35,1); #199.4
+select round(64.4453,2); #64.45
 
 
 
