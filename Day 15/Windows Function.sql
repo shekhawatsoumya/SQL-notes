@@ -190,6 +190,56 @@ group by 1,2)
 select * from cte where r_employeesales=2;
 
 
+use dummy;
+#wasq to fetch ordernumber,productcode and their ordervalue only fetch the record whose ordervalue between 2000 and 3000 and sort the data 
+#by ordervalue in desc order?
+select ordernumber,productcode,quantityordered*priceeach as ordervalue from orderdetails
+where quantityordered*priceeach between 2000 and 3000
+group by 1,2
+order by ordervalue desc;
+
+#wasq to fetch top 2 manager name by no. of employee they managed with the help of dense rank?
+with cte as
+(select concat(m.firstname," ",m.lastname) as manager,count(*) as empcount,
+dense_rank() over(order by count(*) desc) as r_n from employees m join employees e
+on m.employeenumber=e.reportsto
+group by 1)
+select * from cte where r_n<=2;
+
+use dummy;
+#wasq to fetch customername and their totalordervalue of each quarter or each country(fetch second and third highest)?
+with cte as
+(select customername,sum(quantityordered*priceeach) as totalordervalue,country,quarter(orderdate),
+dense_rank() over(partition by country,quarter(orderdate) order by sum(quantityordered*priceeach) desc) as r_n
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber)
+group by 1,3,4)
+select * from cte where r_n in (2,3);
+
+#wasq to find percentile_rank of every productline by totalsales and also roundoff the percent_rank upto 2 decimal places?
+select productline,sum(quantityordered*priceeach) as totalsales,
+round(percent_rank() over(order by sum(quantityordered*priceeach) asc),2) as p_rank from products join orderdetails using(productcode)
+group by 1;
+
+#wasq to fetch to find percentile_rank of employees by totalsales of each orderyear?
+select concat(firstname," ",lastname) as empfullname,sum(quantityordered*priceeach) as totalsales,year(orderdate) as orderyear,
+round(percent_rank() over(partition by year(orderdate) order by sum(quantityordered*priceeach) asc),2) as p_rn from employees e 
+join customers c on e.employeenumber=c.salesrepemployeenumber 
+join orders using(customernumber)
+join orderdetails using(ordernumber)
+group by 1,3;
+
+#wasq to fetch customername,usa,eachyear acc to totalsales percentilerank?
+with cte as
+(select customername,year(orderdate) as eachyear,sum(quantityordered*priceeach) as totalsales,
+round(percent_rank() over(partition by year(orderdate) order by sum(quantityordered*priceeach) asc),2) as p_rn
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber) 
+where country="usa"
+group by 1,2)
+select * from cte where p_rn>=.50;
+
+
 
 
 
