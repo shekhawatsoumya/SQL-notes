@@ -98,7 +98,96 @@ join orders using(customernumber)
 join orderdetails using(ordernumber)
 join products using(productcode);
 
+use dummy;
+#wasq to fetch totalorderdount of each country of each year?
+select country,year(orderdate),ordernumber,count(ordernumber) over(partition by country,year(orderdate)) as totalordercount
+from customers join orders using(customernumber);
 
+select country,year(orderdate),count(ordernumber) as totalordernumber
+from customers join orders using(customernumber)
+group by 1,2;
+
+
+#RANK
+#ROW_RANK()
+
+#wasq to give sequential numbe rto products table?
+select*,row_number() over() as r_no from products;
+
+select row_number() over() as r_no,p.* from products p;
+
+select row_number() over(order by buyprice desc) as r_no,p.* from products p;
+
+#wasq to give sequential number to each productline in products table?
+with cte as
+(select productline,productname,buyprice,
+row_number() over(partition by productline) as r_no from products)
+select * from cte where r_no=1;
+
+select *,
+row_number() over(partition by fiscal_year order by sale desc) as r_no,
+rank() over(partition by fiscal_year order by sale desc) as rn,
+dense_rank() over(partition by fiscal_year order by sale desc) as d_rn
+from sales1;
+
+#wasq to fetch highest ordervalue customers of each country by dense_rank?
+with cte as
+(select customername,country,sum(quantityordered*priceeach) as ordervalue,
+dense_rank() over(partition by country order by sum(quantityordered*priceeach) desc) as d_r
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber)
+group by 1,2)
+select * from cte where d_r=1;
+
+#wasq to fetch least selling product of each productline by rank?
+with cte as
+(select productname,productline,quantityordered,
+rank() over(partition by productline order by quantityordered asc) as rno
+from products inner join orderdetails using(productcode))
+select * from cte where rno=1;
+
+use dummy;
+
+#wasq to fetch 2nd and 3rd highest quantityordered product of each productline?
+with cte as
+(select productline,productname,sum(quantityordered) as totalquantordered,
+dense_rank() over(partition by productline order by sum(quantityordered) desc) as denr_quant
+from products join orderdetails using (productcode)
+group by 1,2)
+select * from cte where denr_quant in (2,3);
+
+with cte as
+(select dense_rank() over(partition by productline order by sum(quantityordered) desc) as denr_quant,
+productline,productname,sum(quantityordered) as totalquantordered
+from products join orderdetails using (productcode)
+group by productline,productname)
+select * from cte where denr_quant in (2,3);
+
+#wasq to fetch 3rd highest ordercount customer of each year?
+with cte as
+(select customername,year(orderdate) as year,count(ordernumber),
+dense_rank() over(partition by year(orderdate) order by count(ordernumber) desc) as denr_ordercount
+from customers join orders using(customernumber)
+group by 1,2)
+select * from cte where denr_ordercount=3;
+
+#wasq to fetch least ordercount customer of each year of each country?
+with cte as
+(select customername,country,year(orderdate),count(ordernumber) as ordercount,
+dense_rank() over(partition by year(orderdate),country order by count(ordernumber) asc) as r_ordercount
+from customers join orders using(customernumber)
+group by 1,2,3)
+select * from cte where r_ordercount=1;
+
+#wasq to fetch 2nd highest employee(acc to totalsales) of each year?
+with cte as
+(select concat(firstname," ",lastname) as empfullname,year(orderdate),sum(quantityordered*priceeach) as totalsales,
+dense_rank() over(partition by year(orderdate) order by sum(quantityordered*priceeach) desc) as r_employeesales
+from employees join customers on employeenumber=salesrepemployeenumber
+join orders using(customernumber)
+join orderdetails using(ordernumber)
+group by 1,2)
+select * from cte where r_employeesales=2;
 
 
 
