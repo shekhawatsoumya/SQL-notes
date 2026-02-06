@@ -281,7 +281,78 @@ lag((quantityordered*priceeach),1,0) over(partition by customername order by (qu
 from customers join orders using(customernumber)
 join orderdetails using(ordernumber);
 
+#QUE-
+#List all customers whose first order was placed in  the 
+#first quarter (Q1) of any year, and also show the day  of the week they first ordered. 
+select customername;
 
+#Rank customers by total purchase amount (using  RANK()), then classify them into 
+#quartiles (Q1, Q2, Q3,  Q4) using CASE WHEN. 
+with cte as
+(select customername,sum(quantityordered*priceeach) as totalpuramt,quarter(orderdate),
+dense_rank() over(partition by quarter(orderdate) order by sum(quantityordered*priceeach) desc) as r_cust
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber)
+group by 1,3);
+select *;
+
+#For each customer, display their order history along  with the difference in days 
+#between consecutive orders (using LAG()), and highlight with CASE WHEN if the gap is  more than 30 days.
+with cte as
+(select customername,ordernumber,orderdate as current_orderdate,
+lag(orderdate,1,0) over(partition by customername) as prv_orderdate
+from customers join orders using(customernumber)),
+cte1 as
+(select *,datediff(current_orderdate,prv_orderdate) as diff from cte)
+select *,
+case
+when diff>30 then "highlight"
+else " "
+end  from cte1;
+
+#LEAD
+#For each order, find the order date and the next order date of the same customer.
+select customername,ordernumber,(orderdate) as current_ordrdate,
+lead(orderdate,1,0) over(partition by customername) as next_ordrdate
+from customers join orders using(customernumber);
+
+#For each customer, show the order value and the next order’s value.
+select customername,(quantityordered*priceeach) as current_ordrvalue,
+lead(quantityordered*priceeach,1,0) over (partition by customername) as next_ordrvalue
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
+
+#For each payment, display the payment amount and the next payment amount made by that customer.
+select customername,(amount) as current_paymntamnt,
+lead(amount,1,0) over(partition by customername) as next_paymntamnt
+from customers join payments using(customernumber);
+
+select customername,(quantityordered*priceeach) as current_paymntamnt,
+lead(quantityordered*priceeach,1,0) over(partition by customername) as next_paymntamnt
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
+
+#lag
+#For each customer’s order, find the order amount along with the previous order’s amount.
+select customername,ordernumber,(quantityordered*priceeach) as current_ordramnt,
+lag((quantityordered*priceeach),1,0) over(partition by customername order by (quantityordered*priceeach) asc) as prv_ordramnt
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
+
+#For each order, show the order date and the previous order date of the same customer.
+select customername,ordernumber,(orderdate) as cureent_ordrdate,
+lag(orderdate,1,0) over (partition by customername order by orderdate asc) as prv_ordrdate
+from customers join orders using(customernumber);
+
+#For each payment, display the payment amount and the previous payment amount made by that customer.
+select customername,(amount) as current_paymntamnt,
+lag(amount,1,0) over(partition by customername) as prv_paymntamnt
+from customers join payments using(customernumber);
+
+select customername,(quantityordered*priceeach) as current_paymntamnt,
+lag(quantityordered*priceeach,1,0) over(partition by customername) as prv_paymntamnt
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
 
 
 
