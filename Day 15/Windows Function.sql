@@ -239,6 +239,50 @@ where country="usa"
 group by 1,2)
 select * from cte where p_rn>=.50;
 
+use dummy;
+#VALUE WINDOW FUNCTION
+#WF(COLUMN,[OFFSET],[IFNOTFOUND-"NULL"]) over(partition defn
+#                                             order defn)
+#LAG is previous
+#LEAD is next
+
+#LAG
+use dummy;
+#wasq to fetch totalsales diff. b/w current and the previous year of each productline of each year?
+with cte as
+(select productline,year(orderdate) as year,sum(quantityordered*priceeach) as totalsales,
+lag(sum(quantityordered*priceeach),1,0) over(partition by productline order by year(orderdate) asc) as previous
+from products 
+join orderdetails using(productcode)
+join orders using(ordernumber)
+group by 1,2)
+select *,(totalsales-previous) as diff from cte;
+
+#wasq to fetch for each customers order find the orderamount along with previous ordersamount?
+select customername,(quantityordered*priceeach) as current_orderamount,
+lag((quantityordered*priceeach),1,0) over (partition by customername order by (quantityordered*priceeach) asc) as previous_orderamnt
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
+
+#wasq to fetch for each year show the day diff b/w current orderdate an previous orderdate of the same customer?
+with cte as
+(select customername,(orderdate) as current_orderdate,
+lag((orderdate),1,0) over(partition by customername order by orderdate asc) as prv_orderdate
+from customers join orders using(customernumber))
+select *,datediff(current_orderdate,prv_orderdate) as diff from cte;
+
+#wasq to fetch for each payment display the payment and the previous payment amount made by the customer?
+select customername,amount as current_amt,
+lag(amount,1,0) over(partition by customername order by amount asc) as prv_amt
+from customers join payments using(customernumber);
+
+select customername,(quantityordered*priceeach) as current_amt,
+lag((quantityordered*priceeach),1,0) over(partition by customername order by (quantityordered*priceeach) asc) as prv_amt
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
+
+
+
 
 
 
