@@ -66,6 +66,17 @@ from customers join orders using(customernumber)
 join orderdetails using(ordernumber)
 join products using(productcode);
 
+#For each payment, show the payment amount along with the first payment amount of that customer
+select customername,(quantityordered*priceeach) as payment_amt,
+first_value(quantityordered*priceeach) over(partition by customername order by (quantityordered*priceeach) asc
+range between unbounded preceding and unbounded following)  as first_paymntamnt
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber);
+
+select customername,(amount) as payment_amt,
+first_value(amount) over(partition by customername order by amount asc
+range between unbounded preceding and unbounded following)  as first_paymntamnt
+from customers join payments;
 
 
 
