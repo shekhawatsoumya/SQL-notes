@@ -40,5 +40,32 @@ last_value(employee_name) over(order by hours asc
 range between unbounded preceding and unbounded following) as mostovertimeemployee
 from overtime;
 
+#wasq to fetch employeename,overtime and the least and the highest overtime employee of each dept?
+select employee_name,hours,department,
+first_value(employee_name) over(partition by department order by hours asc
+range between unbounded preceding and unbounded following) as leastovertimeemployee,
+last_value(employee_name) over(partition by department order by hours asc
+range between unbounded preceding and unbounded following) as mostovertimeemployee
+from overtime;
+
+
+#FIRST_VALUE and LAST_VALUE
+
+#FIRST_VALUE – Practice Questions
+#For each order, show the order date along with the first purchase date of that customer.
+select customername,ordernumber,orderdate,
+first_value(orderdate) over(partition by customername order by orderdate asc
+range between unbounded preceding and unbounded following) as first_purchasedate
+from customers join orders using(customernumber);
+
+#For each customer, list the orders along with the first product they ever ordered.
+select customername,ordernumber,productname,
+first_value(productname) over(partition by customername order by productname
+range between unbounded preceding and unbounded following) as fist_productname
+from customers join orders using(customernumber)
+join orderdetails using(ordernumber)
+join products using(productcode);
+
+
 
 
