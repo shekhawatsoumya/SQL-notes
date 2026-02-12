@@ -24,4 +24,28 @@ rename table cust_details to customer_details;
 # drop view
 drop view customer_details;
 
+# create view from another view
+create view cust_details as
+select customername,customernumber,city,state,country from cust_details_usa;
+
+select * from cust_details;
+
+# join two views
+select count(*) from cust_details_usa cross join cust_details;
+
+# updatable view
+create view customer_details as
+select * from customers;
+
+update customer_details set customername ="decode"
+where customernumber=103;
+
+select * from customers;
+
+create algorithm= undefined view order_details as
+select * from orders;
+
+update order_details set status="cancelled"
+where ordernumber=10100;
+
 
