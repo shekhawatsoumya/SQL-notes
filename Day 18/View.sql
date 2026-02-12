@@ -48,4 +48,14 @@ select * from orders;
 update order_details set status="cancelled"
 where ordernumber=10100;
 
+# non updatable view
 
+create algorithm= temptable view customer_details_france as
+select * from customers where country ="france";
+
+select * from customer_details_france;
+
+update customer_details_france set customername="data"
+where customernumber=103;
+
+show full tables;
