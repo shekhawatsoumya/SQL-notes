@@ -160,6 +160,60 @@ delimiter ;
 
 call emplyeesales("usa",2,2005);
 
+use dummy;
+#Out parameter
+#wa storedprocedure that returns ordercount of each customer
+#take cnumber as input parameter and total as output parameter?
+
+delimiter $$
+create procedure cust_order_count(in cnumber int,out total int)
+begin
+ select count(ordernumber) into total from customers
+ join orders using(customernumber)
+ where customernumber=cnumber;
+end $$
+delimiter ;
+
+call cust_order_count(237,@total);
+
+select if(@total=2, "repeated customer",
+	    if(@total=3, "frequent customer","loyal customer")) as customer_type;
+
+#wa storedprocedure that returns totalquantityordered and tov of each productline
+#take p_productline as inputparameter and 2 out parameters
+#1st tquantity and tordervalue?
+
+delimiter $$
+create procedure productline_details(in p_productline varchar(100),out tquantity int,out tordervalue int)
+begin
+ select sum(quantityordered) as totalquantordered,sum(quantityordered*priceeach) as tov into tquantity,tordervalue from products 
+ join orderdetails using(productcode)
+ where productline=p_productline;
+end $$
+delimiter ;
+
+call productline_details("ships",@tquantity,@tordervalue);
+
+select @tquantity,@tordervalue;
+
+#wa storedprocedure to fetch ordercount and the tov of each customer of each year
+#input cnuumber,o_year
+#out c_ocount,c_tov
+
+delimiter $$
+create procedure cust_order_count_value(in cnumber int,in o_year year,out c_ocount int,out c_tov decimal(10,2))
+begin 
+select count(ordernumber),sum(quantityordered*priceeach) into c_ocount,c_tov 
+from customers inner join orders using(customernumber)
+inner join orderdetails using(ordernumber)
+where customernumber= cnumber and year(orderdate) = o_year;
+end $$
+delimiter ;
+
+call cust_order_count_value(103,2004,@c_ocount,@c_tov);
+select @c_ocount,@c_tov;
+
+
 
 
 
