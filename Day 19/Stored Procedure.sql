@@ -213,7 +213,20 @@ delimiter ;
 call cust_order_count_value(103,2004,@c_ocount,@c_tov);
 select @c_ocount,@c_tov;
 
+use dummy;
+delimiter $$
+create procedure cust_update(in cnumber int,inout cname varchar(100))
+ begin
+   update customers set customername=cname
+   where customernumber=cnumber;
+end $$
+delimiter ;
 
+set @cname="decode";
+
+call cust_update(103,@cname);
+
+select * from customers;
 
 
 
