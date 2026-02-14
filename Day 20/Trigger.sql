@@ -95,7 +95,24 @@ values(10101,"dgh"," gfd"," ghd","91 59841","1645bhsdgn","h4cscd","bpl","mp","46
 
 select * from customers where customernumber=10101;
 
+use dummy;
 
+#create an after update trigger customer may change their creditlimit.
+#we want to lock every creditlimit change so we know the history?
+
+delimiter $$
+create trigger customers_after_update
+after update on customers
+for each row
+begin
+   if new.creditlimit!=old.creditlimit then
+   insert into customers_log(cid,cname,creditlimit,action)
+   values(old.customernumber,old.customername,old.creditlimit,concat_ws(" ","changecreditlimit",old.creditlimit,"to",new.creditlimit));
+  end if;
+end $$
+delimiter ;
+drop trigger customers_after_update;
+update customers set creditlimit=20.00 where customernumber=10101;
 
 
 
